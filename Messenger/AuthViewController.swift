@@ -32,7 +32,9 @@ class AuthViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .white
+        googleButton.costomizeGoogleButton()
         setupConstraints()
+        
     }
 }
 

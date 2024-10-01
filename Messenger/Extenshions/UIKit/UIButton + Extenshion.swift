@@ -32,4 +32,12 @@ extension UIButton {
             self.layer.shadowRadius = 4
         }
     }
+    
+    func costomizeGoogleButton() {
+        let googleLogoImage = UIImageView(image: .googleLogo, contentMode: .scaleAspectFit)
+        googleLogoImage.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(googleLogoImage)
+        googleLogoImage.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24).isActive = true
+        googleLogoImage.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+    }
 }
