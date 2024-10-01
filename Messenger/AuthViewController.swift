@@ -20,25 +20,24 @@ class AuthViewController: UIViewController {
     let googleLabel = UILabel(text: "Get started with Google")
     let emailLabel = UILabel(text: "Or sign up with")
     let alreadyOnboardLabel = UILabel(text: "Already onboard?")
-    
     let googleButton = UIButton(title: "Google", titleColor: .black, backgroundColor: .mainWhiteColor(), isShadow: true)
-    
     let emailButton = UIButton(title: "Email", titleColor: .mainWhiteColor(), backgroundColor: .mainDarkColor())
-    
     let loginButton = UIButton(title: "Login", titleColor: .mainRedColor(), backgroundColor: .mainWhiteColor(), isShadow: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setupUI()
     }
     
-    func setupUI() {
+    private func setupUI() {
         view.backgroundColor = .white
-        
         setupConstraints()
     }
-    
+}
+
+// MARK: - Setup Constraints
+extension AuthViewController {
     func setupConstraints() {
         
         let googleView = ButtonFormView(label: googleLabel, button: googleButton)
@@ -63,8 +62,8 @@ class AuthViewController: UIViewController {
             ]
         )
     }
-}
 
+}
 
 #Preview {
     AuthViewController()
