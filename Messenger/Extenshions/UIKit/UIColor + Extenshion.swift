@@ -19,5 +19,9 @@ extension UIColor {
     static func mainDarkColor() -> UIColor {
         return UIColor.mainDark
     }
+    
+    static func mainGrayColor() -> UIColor {
+        return UIColor.mainGray
+    }
 }
 
