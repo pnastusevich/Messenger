@@ -13,10 +13,14 @@ extension UIFont {
     }
     
     static func arial26() -> UIFont {
-        return UIFont.init(name: "Arial", size: 26)!
+        return UIFont.boldSystemFont(ofSize: 26)
     }
     
     static func arial40() -> UIFont {
-        return UIFont.init(name: "Arial", size: 40)!
+        return UIFont.boldSystemFont(ofSize: 40)
+    }
+    
+    static func arial16() -> UIFont {
+        return UIFont.init(name: "Arial", size: 16)!
     }
 }
