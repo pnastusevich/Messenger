@@ -8,6 +8,8 @@
 import UIKit
 
 class ActiveChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
+  
+    
     static var reuseId = "ActiveChatCell"
     
     let friendImageView = UIImageView()
@@ -20,10 +22,15 @@ class ActiveChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
         setupUICell()
     }
     
-    func configure(with value: MChat) {
+    func configure<U>(with value: U) where U : Hashable {
+        guard let value: ModelChat = value as? ModelChat else { return }
         friendImageView.image = UIImage(named: value.userImageString)
         friendName.text = value.username
         lastMessage.text = value.lastMessage
+    }
+    
+    func configure(with value: ModelChat) {
+    
     }
     
     required init?(coder: NSCoder) {
