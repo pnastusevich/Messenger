@@ -21,7 +21,7 @@ final class LoginViewController: UIViewController {
     private let googleButton = UIButton(title: "Google", titleColor: .black, backgroundColor: .mainWhite, isShadow: true)
     private let loginButton = UIButton(title: "Login", titleColor: .mainWhite, backgroundColor: .mainDark)
     
-    private let signInButton: UIButton = {
+    private let signUpButton: UIButton = {
         let button = UIButton()
         button.setTitle("Sig In", for: .normal)
         button.titleLabel?.font = .arial20()
@@ -30,17 +30,43 @@ final class LoginViewController: UIViewController {
         return button
     }()
     
+    weak var delegate: AuthNavigationDelegate?
+    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         setupView()
+        
+        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
+
+    }
+    
+    @objc private func loginButtonTapped() {
+        AuthStorageManager.shared.login(email: emailTextField.text, password: passwordTextField.text) { (result) in
+            switch result {
+            case .success(let user):
+                self.showAlert(title: "Done", message: "You are logged in") {
+                    self.present(SetupProfileViewController(currentUser: user), animated: true)
+                }
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        }
+    }
+    
+    @objc private func signUpButtonTapped() {
+        dismiss(animated: true) {
+            self.delegate?.toSignUpViewController()
+        }
     }
 }
 
 // MARK: - Setup View
 private extension LoginViewController {
     func setupView() {
+        view.backgroundColor = .white
+
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         loginWithLabel.translatesAutoresizingMaskIntoConstraints = false
         googleButton.translatesAutoresizingMaskIntoConstraints = false
@@ -49,9 +75,9 @@ private extension LoginViewController {
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         loginButton.translatesAutoresizingMaskIntoConstraints = false
         needAnAccountLabel.translatesAutoresizingMaskIntoConstraints = false
-        signInButton.translatesAutoresizingMaskIntoConstraints = false
+        signUpButton.translatesAutoresizingMaskIntoConstraints = false
         
-        setupSubviews(welcomeLabel, loginWithLabel, googleButton, orLabel, emailTextField, passwordTextField, loginButton, needAnAccountLabel, signInButton)
+        setupSubviews(welcomeLabel, loginWithLabel, googleButton, orLabel, emailTextField, passwordTextField, loginButton, needAnAccountLabel, signUpButton)
         
         setupConstraints()
         googleButton.costomizeGoogleButton()
@@ -69,7 +95,7 @@ private extension LoginViewController {
             welcomeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 140),
             welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            loginWithLabel.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 100),
+            loginWithLabel.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 80),
             loginWithLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             loginWithLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             
@@ -78,11 +104,11 @@ private extension LoginViewController {
             googleButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             googleButton.heightAnchor.constraint(equalToConstant: 60),
             
-            orLabel.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: 40),
+            orLabel.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: 25),
             orLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             orLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             
-            emailTextField.topAnchor.constraint(equalTo: orLabel.bottomAnchor, constant: 40),
+            emailTextField.topAnchor.constraint(equalTo: orLabel.bottomAnchor, constant: 25),
             emailTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             emailTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             emailTextField.heightAnchor.constraint(equalToConstant: 60),
@@ -97,14 +123,25 @@ private extension LoginViewController {
             loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             loginButton.heightAnchor.constraint(equalToConstant: 60),
             
-            needAnAccountLabel.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 50),
+            needAnAccountLabel.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 30),
             needAnAccountLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             needAnAccountLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             
-            signInButton.centerYAnchor.constraint(equalTo: needAnAccountLabel.centerYAnchor),
-            signInButton.leadingAnchor.constraint(equalTo: needAnAccountLabel.trailingAnchor, constant: -140),
-            signInButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
+            signUpButton.centerYAnchor.constraint(equalTo: needAnAccountLabel.centerYAnchor),
+            signUpButton.leadingAnchor.constraint(equalTo: needAnAccountLabel.trailingAnchor, constant: -140),
+            signUpButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
             ])
+    }
+}
+
+extension LoginViewController {
+    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
+            completion()
+        }
+        alertController.addAction(okAction)
+        present(alertController, animated: true)
     }
 }
 

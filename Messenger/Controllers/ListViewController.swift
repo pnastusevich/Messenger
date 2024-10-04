@@ -81,10 +81,17 @@ extension ListViewController {
             
             switch section {
             case .activeChats:
-                return self.configureCell(collectionView: collectionView, cellType: ActiveChatCell.self, with: chat, for: indexPath)
+                return self.configureCell(collectionView: collectionView,
+                                          cellType: ActiveChatCell.self,
+                                          with: chat,
+                                          for: indexPath
+                )
             case .waitingChats:
-                return self.configureCell(collectionView: collectionView, cellType: WaitingChatCell.self, with: chat, for: indexPath)
-
+                return self.configureCell(collectionView: collectionView,
+                                          cellType: WaitingChatCell.self,
+                                          with: chat,
+                                          for: indexPath
+                )
             }
         })
         
@@ -96,7 +103,10 @@ extension ListViewController {
             guard let section = Section(rawValue: indexPath.section) else {
                 fatalError("Unowned section kind")
             }
-            sectionHeader.configure(text: section.description(), font: .arial20(), textColor: .mainBrown)
+            sectionHeader.configure(text: section.description(),
+                                    font: .arial20(),
+                                    textColor: .mainBrown
+            )
             return sectionHeader
         }
     }
@@ -127,11 +137,15 @@ extension ListViewController {
     private func createWaitingChats() -> NSCollectionLayoutSection {
         
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                              heightDimension: .fractionalHeight(1))
+                                              heightDimension: .fractionalHeight(1)
+        )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(88),
-                                               heightDimension: .absolute(88))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                                               heightDimension: .absolute(88)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: [item]
+        )
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 20
         section.contentInsets = NSDirectionalEdgeInsets.init(top: 16, leading: 20, bottom: 0, trailing: 20)
@@ -149,7 +163,9 @@ extension ListViewController {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                heightDimension: .absolute(78)
         )
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize,
+                                                     subitems: [item]
+        )
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 8
         section.contentInsets = NSDirectionalEdgeInsets.init(top: 16, leading: 20, bottom: 0, trailing: 20)

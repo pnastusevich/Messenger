@@ -10,11 +10,25 @@ import UIKit
 class ChatRequestViewController: UIViewController {
     
     let containerView = UIView()
-    let imageView = UIImageView(image: UIImage(named: "human5")!, contentMode: .scaleAspectFill)
+    let imageView = UIImageView(image: UIImage(named: "human5")!,
+                                contentMode: .scaleAspectFill
+    )
     let nameLabel = UILabel(text: "Peter Petegru", font: .arial20())
-    let aboutMeLabel = UILabel(text: "You have the opportunity to to start a new chat", font: .arial16())
-    let acceptButton = UIButton(title: "Accept", titleColor: .mainWhite, backgroundColor: .mainDark, font: .arial20(), cornerRadius: 10)
-    let denyButton = UIButton(title: "Deny", titleColor: .mainRed, backgroundColor: .mainWhite, font: .arial20(), cornerRadius: 10)
+    let aboutMeLabel = UILabel(text: "You have the opportunity to to start a new chat",
+                               font: .arial16()
+    )
+    let acceptButton = UIButton(title: "Accept",
+                                titleColor: .mainWhite,
+                                backgroundColor: .mainDark,
+                                font: .arial20(),
+                                cornerRadius: 10
+    )
+    let denyButton = UIButton(title: "Deny",
+                              titleColor: .mainRed,
+                              backgroundColor: .mainWhite,
+                              font: .arial20(),
+                              cornerRadius: 10
+    )
     
     override func viewDidLoad() {
         super.viewDidLoad()

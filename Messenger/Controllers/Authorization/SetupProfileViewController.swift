@@ -5,6 +5,7 @@
 //  Created by Паша Настусевич on 1.10.24.
 //
 
+import FirebaseAuth
 import UIKit
 
 final class SetupProfileViewController: UIViewController {
@@ -20,15 +21,49 @@ final class SetupProfileViewController: UIViewController {
     private let genderSegmentedControl = UISegmentedControl(first: "Male", second: "Female")
     private let goToChatsButton = UIButton(title: "Go to chats", titleColor: .mainWhite, backgroundColor: .mainDark, cornerRadius: 10)
     
+    private let currentUser: User
+    
+    init(currentUser: User) {
+        self.currentUser = currentUser
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        
+        goToChatsButton.addTarget(self, action: #selector(goToChatsButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func goToChatsButtonTapped() {
+        guard let userEmail = currentUser.email else { return }
+        
+        FirestoreStorageManager.shared.saveProfileWith(
+            id: currentUser.uid,
+            email: userEmail,
+            username: fullNameTextField.text,
+            avatarImageString: "nil",
+            description: aboutMeTextField.text,
+            gender: genderSegmentedControl.titleForSegment(at: genderSegmentedControl.selectedSegmentIndex)) { result in
+                switch result {
+                case .success(let modelUser):
+                    self.showAlert(title: "Успешно", message: "Приятного общения")
+                case .failure(let error):
+                    self.showAlert(title: "Error", message: error.localizedDescription)
+                }
+            }
     }
 }
 
 // MARK: - Setup View
 private extension SetupProfileViewController {
     func setupView() {
+        view.backgroundColor = .white
+        
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         fullImageView.translatesAutoresizingMaskIntoConstraints = false
         fullNameTextField.translatesAutoresizingMaskIntoConstraints = false
@@ -82,7 +117,18 @@ private extension SetupProfileViewController {
         ])
     }
 }
+
+extension SetupProfileViewController {
+    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
+            completion()
+        }
+        alertController.addAction(okAction)
+        present(alertController, animated: true)
+    }
+}
                 
 #Preview {
-    SetupProfileViewController()
+    SetupProfileViewController(currentUser: Auth.auth().currentUser!)
 }

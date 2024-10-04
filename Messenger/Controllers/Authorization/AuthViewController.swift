@@ -24,10 +24,34 @@ final class AuthViewController: UIViewController {
     private let emailButton = UIButton(title: "Email", titleColor: .mainWhite, backgroundColor: .mainDark)
     private let loginButton = UIButton(title: "Login", titleColor: .mainRed, backgroundColor: .mainWhite, isShadow: true)
     
+    let signUpViewController = SignUpViewController()
+    let loginViewController = LoginViewController()
+    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        
+        emailButton.addTarget(self, action: #selector(emailButtonTapped), for: .touchUpInside)
+        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        googleButton.addTarget(self, action: #selector(googleButtonTapped), for: .touchUpInside)
+        
+        signUpViewController.delegate = self
+        loginViewController.delegate = self
+    }
+    
+    @objc private func emailButtonTapped() {
+        print(#function)
+        present(signUpViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func loginButtonTapped() {
+        print(#function)
+        present(loginViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func googleButtonTapped() {
+        print(#function)
     }
 }
 
@@ -87,6 +111,16 @@ private extension AuthViewController {
             loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             loginButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+}
+
+extension AuthViewController: AuthNavigationDelegate {
+    func toLoginViewControler() {
+        present(loginViewController, animated: true)
+    }
+    
+    func toSignUpViewController() {
+        present(signUpViewController, animated: true)
     }
 }
 

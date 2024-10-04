@@ -74,10 +74,13 @@ extension PeopleViewController {
             guard let section = Section(rawValue: indexPath.section) else {
                 fatalError("Unknown section kind")
             }
-            
             switch section {
             case .users:
-                return self.configureCell(collectionView: collectionView, cellType: UserCell.self, with: user, for: indexPath)
+                return self.configureCell(collectionView: collectionView,
+                                          cellType: UserCell.self,
+                                          with: user,
+                                          for: indexPath
+                )
             }
         })
         

@@ -12,6 +12,8 @@ struct ModelChat: Hashable, Decodable {
     var lastMessage: String
     var id: Int
     
+    
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
