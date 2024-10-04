@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		857EFDE12CAEE0FC00E685CF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 857EFDE02CAEE0FC00E685CF /* FirebaseAnalytics */; };
+		857EFDE32CAEE0FC00E685CF /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 857EFDE22CAEE0FC00E685CF /* FirebaseAuth */; };
+		85D9E43C2CAFF3B200E48A02 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 85D9E43B2CAFF3B200E48A02 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		85C76E912CAAF4FF003385F0 /* Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				857EFDE12CAEE0FC00E685CF /* FirebaseAnalytics in Frameworks */,
+				857EFDE32CAEE0FC00E685CF /* FirebaseAuth in Frameworks */,
+				85D9E43C2CAFF3B200E48A02 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				85C76E932CAAF4FF003385F0 /* Messenger */,
+				85D9E43A2CAFF3B200E48A02 /* Frameworks */,
 				85C76E922CAAF4FF003385F0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +66,13 @@
 				85C76E912CAAF4FF003385F0 /* Messenger.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		85D9E43A2CAFF3B200E48A02 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -78,6 +95,9 @@
 			);
 			name = Messenger;
 			packageProductDependencies = (
+				857EFDE02CAEE0FC00E685CF /* FirebaseAnalytics */,
+				857EFDE22CAEE0FC00E685CF /* FirebaseAuth */,
+				85D9E43B2CAFF3B200E48A02 /* FirebaseFirestore */,
 			);
 			productName = Messenger;
 			productReference = 85C76E912CAAF4FF003385F0 /* Messenger.app */;
@@ -107,6 +127,9 @@
 			);
 			mainGroup = 85C76E882CAAF4FF003385F0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				857EFDDF2CAEE0FC00E685CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 85C76E922CAAF4FF003385F0 /* Products */;
 			projectDirPath = "";
@@ -341,6 +364,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		857EFDDF2CAEE0FC00E685CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		857EFDE02CAEE0FC00E685CF /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 857EFDDF2CAEE0FC00E685CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		857EFDE22CAEE0FC00E685CF /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 857EFDDF2CAEE0FC00E685CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		85D9E43B2CAFF3B200E48A02 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 857EFDDF2CAEE0FC00E685CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 85C76E892CAAF4FF003385F0 /* Project object */;
 }

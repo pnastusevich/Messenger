@@ -11,8 +11,12 @@ class ProfileViewController: UIViewController {
     
     let containerView = UIView()
     let imageView = UIImageView(image: UIImage(named: "human1")!, contentMode: .scaleAspectFill)
-    let nameLabel = UILabel(text: "Pavel Nastusevich", font: .arial20())
-    let aboutMeLabel = UILabel(text: "You have the opportunity to chat with the best people in the world.", font: .arial16())
+    let nameLabel = UILabel(text: "Pavel Nastusevich",
+                            font: .arial20()
+    )
+    let aboutMeLabel = UILabel(text: "You have the opportunity to chat with the best people in the world.",
+                               font: .arial16()
+    )
     let myTextField = InsertableTextField()
     
     override func viewDidLoad() {

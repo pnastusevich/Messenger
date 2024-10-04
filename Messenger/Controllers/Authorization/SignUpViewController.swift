@@ -27,16 +27,40 @@ final class SignUpViewController: UIViewController {
     private let passwordTextField = OneLineTextField(font: .arial20(), placeholder: "Password")
     private let confirmPasswordTextField = OneLineTextField(font: .arial20(), placeholder: "Confirm password")
     
+    weak var delegate: AuthNavigationDelegate?
+    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        
+        signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
+        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func signUpButtonTapped() {
+        AuthStorageManager.shared.register(email: emailTextField.text, password: passwordTextField.text, confirmPassword: confirmPasswordTextField.text) { (result) in
+            switch result {
+            case .success(let user):
+                self.showAlert(title: "Done", message: "You registered successfully") {
+                    self.present(SetupProfileViewController(currentUser: user), animated: true)
+                }
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        }
+    }
+    @objc private func loginButtonTapped() {
+        self.dismiss(animated:  true) {
+            self.delegate?.toLoginViewControler()
+        }
     }
 }
 
 // MARK: - Setup View
 private extension SignUpViewController {
     func setupView() {
+        view.backgroundColor = .white
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         alreadyOnboardLabel.translatesAutoresizingMaskIntoConstraints = false
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
@@ -62,7 +86,7 @@ private extension SignUpViewController {
         welcomeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 140),
         welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         
-        emailTextField.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 120),
+        emailTextField.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 100),
         emailTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
         emailTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
         emailTextField.heightAnchor.constraint(equalToConstant: 50),
@@ -90,6 +114,17 @@ private extension SignUpViewController {
         loginButton.leadingAnchor.constraint(equalTo: alreadyOnboardLabel.trailingAnchor, constant: -140),
         loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
         ])
+    }
+}
+
+extension SignUpViewController {
+    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
+            completion()
+        }
+        alertController.addAction(okAction)
+        present(alertController, animated: true)
     }
 }
 

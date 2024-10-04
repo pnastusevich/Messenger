@@ -7,8 +7,21 @@
 
 struct ModelUser: Hashable, Decodable {
     var username: String
+    var email: String
     var avatarStringURL: String
-    var id: Int
+    var description: String
+    var gender: String
+    var id: String
+    
+    var representation: [String: Any] {
+        var representation = ["username": username]
+        representation["email"] = email
+        representation["avatarStringURL"] = avatarStringURL
+        representation["description"] = description
+        representation["gender"] = gender
+        representation["uid"] = id
+        return representation
+    }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
