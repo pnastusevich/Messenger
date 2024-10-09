@@ -39,6 +39,7 @@ final class LoginViewController: UIViewController {
         
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
         signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
+        googleButton.addTarget(self, action: #selector(googleButtonTapped), for: .touchUpInside)
 
     }
     
@@ -47,7 +48,16 @@ final class LoginViewController: UIViewController {
             switch result {
             case .success(let user):
                 self.showAlert(title: "Done", message: "You are logged in") {
-                    self.present(SetupProfileViewController(currentUser: user), animated: true)
+                    FirestoreStorageManager.shared.getUserData(user: user) { result in
+                        switch result {
+                        case .success(let modelUser):
+                            let mainTabBarController = MainTabBarController(currentUser: modelUser)
+                            mainTabBarController.modalPresentationStyle = .fullScreen
+                            self.present(mainTabBarController, animated: true, completion: nil)
+                        case .failure(_):
+                            self.present(SetupProfileViewController(currentUser: user), animated: true, completion: nil)
+                        }
+                    }
                 }
             case .failure(let error):
                 self.showAlert(title: "Error", message: error.localizedDescription)
@@ -59,6 +69,30 @@ final class LoginViewController: UIViewController {
         dismiss(animated: true) {
             self.delegate?.toSignUpViewController()
         }
+    }
+    
+    @objc private func googleButtonTapped() {
+        AuthStorageManager.shared.googleLogin(presentingViewController: self) { result in
+                   switch result {
+                   case .success(let user):
+                       FirestoreStorageManager.shared.getUserData(user: user) { result in
+                           switch result {
+                           case .success(let modelUser):
+                               self.showAlert(title: "Done", message: "You are logged in") {
+                                   let mainTabBarController = MainTabBarController(currentUser: modelUser)
+                                   mainTabBarController.modalPresentationStyle = .fullScreen
+                                   self.present(mainTabBarController, animated: true, completion: nil)
+                               }
+                           case .failure(_):
+                               self.showAlert(title: "Done", message: "You are logged in") {
+                                   self.present(SetupProfileViewController(currentUser: user), animated: true, completion: nil)
+                               }
+                           }
+                       }
+                   case .failure(let error):
+                       self.showAlert(title: "Error", message: error.localizedDescription)
+                   }
+               }
     }
 }
 
@@ -131,17 +165,6 @@ private extension LoginViewController {
             signUpButton.leadingAnchor.constraint(equalTo: needAnAccountLabel.trailingAnchor, constant: -140),
             signUpButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
             ])
-    }
-}
-
-extension LoginViewController {
-    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
-            completion()
-        }
-        alertController.addAction(okAction)
-        present(alertController, animated: true)
     }
 }
 
