@@ -9,11 +9,27 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
+    private let currentUser: ModelUser
+    
+    init(currentUser: ModelUser = ModelUser(username: "Имя",
+                                            email: "Мейл",
+                                            avatarStringURL: "аватар",
+                                            description: "описание",
+                                            gender: "гендер",
+                                            id: "айди")) {
+        self.currentUser = currentUser
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let listVC = ListViewController()
-        let peopleVC = PeopleViewController()
+        let listVC = ListViewController(currentUser: currentUser)
+        let peopleVC = PeopleViewController(currentUser: currentUser)
             
         let boldConfig = UIImage.SymbolConfiguration(weight: .medium)
         guard let peopleImage = UIImage(systemName: "person.2", withConfiguration: boldConfig) else { return }

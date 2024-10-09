@@ -117,17 +117,6 @@ private extension SignUpViewController {
     }
 }
 
-extension SignUpViewController {
-    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
-            completion()
-        }
-        alertController.addAction(okAction)
-        present(alertController, animated: true)
-    }
-}
-
 #Preview {
     SignUpViewController()
 }

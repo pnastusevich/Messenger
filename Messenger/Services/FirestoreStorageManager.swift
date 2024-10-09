@@ -6,6 +6,7 @@
 //
 
 import Firebase
+import FirebaseAuth
 import FirebaseFirestore
 
 class FirestoreStorageManager {
@@ -17,6 +18,23 @@ class FirestoreStorageManager {
     private var userReference: CollectionReference {
         return dataBase.collection("users")
     }
+    
+    func getUserData(user: User, completion: @escaping (Result<ModelUser, Error>) -> Void) {
+        let docReference = userReference.document(user.uid)
+        docReference.getDocument { (document, error) in
+            if let document = document, document.exists {
+                guard let modelUser = ModelUser(document: document) else {
+                    completion(.failure(UserError.cannotUnwrapModelUser))
+                    return
+                }
+                completion(.success(modelUser))
+            } else {
+                completion(.failure(UserError.cannotGetUserInfo))
+            }
+            
+        }
+    }
+    
     func saveProfileWith(id: String, email: String, username: String?, avatarImageString: String?, description: String?, gender: String?, completion: @escaping (Result<ModelUser, Error>) -> Void) {
         
         guard Validators.isFilled(username: username, description: description, gender: gender) else {
@@ -38,4 +56,5 @@ class FirestoreStorageManager {
             }
         }
     }
+    
 }

@@ -40,18 +40,38 @@ final class AuthViewController: UIViewController {
         loginViewController.delegate = self
     }
     
+    // MARK: - Navigation
     @objc private func emailButtonTapped() {
-        print(#function)
         present(signUpViewController, animated: true, completion: nil)
     }
     
     @objc private func loginButtonTapped() {
-        print(#function)
+      
         present(loginViewController, animated: true, completion: nil)
     }
     
     @objc private func googleButtonTapped() {
-        print(#function)
+        AuthStorageManager.shared.googleLogin(presentingViewController: self) { result in
+                   switch result {
+                   case .success(let user):
+                       FirestoreStorageManager.shared.getUserData(user: user) { result in
+                           switch result {
+                           case .success(let modelUser):
+                               self.showAlert(title: "Done", message: "You are registered") {
+                                   let mainTabBarController = MainTabBarController(currentUser: modelUser)
+                                   mainTabBarController.modalPresentationStyle = .fullScreen
+                                   self.present(mainTabBarController, animated: true, completion: nil)
+                               }
+                           case .failure(_):
+                               self.showAlert(title: "Done", message: "You are registered") {
+                                   self.present(SetupProfileViewController(currentUser: user), animated: true, completion: nil)
+                               }
+                           }
+                       }
+                   case .failure(let error):
+                       self.showAlert(title: "Error", message: error.localizedDescription)
+                   }
+               }
     }
 }
 
@@ -123,6 +143,7 @@ extension AuthViewController: AuthNavigationDelegate {
         present(signUpViewController, animated: true)
     }
 }
+
 
 #Preview {
     AuthViewController()

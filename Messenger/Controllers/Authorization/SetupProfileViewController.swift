@@ -26,6 +26,11 @@ final class SetupProfileViewController: UIViewController {
     init(currentUser: User) {
         self.currentUser = currentUser
         super.init(nibName: nil, bundle: nil)
+        
+        if let username = currentUser.displayName {
+            fullNameTextField.text = username
+        }
+        // to do set google image
     }
     
     required init?(coder: NSCoder) {
@@ -51,7 +56,11 @@ final class SetupProfileViewController: UIViewController {
             gender: genderSegmentedControl.titleForSegment(at: genderSegmentedControl.selectedSegmentIndex)) { result in
                 switch result {
                 case .success(let modelUser):
-                    self.showAlert(title: "Успешно", message: "Приятного общения")
+                    self.showAlert(title: "Успешно", message: "Приятного общения") {
+                        let mainTabBarController = MainTabBarController(currentUser: modelUser)
+                        mainTabBarController.modalPresentationStyle = .fullScreen
+                        self.present(mainTabBarController, animated: true, completion: nil)
+                    }
                 case .failure(let error):
                     self.showAlert(title: "Error", message: error.localizedDescription)
                 }
@@ -115,17 +124,6 @@ private extension SetupProfileViewController {
             goToChatsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             goToChatsButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-    }
-}
-
-extension SetupProfileViewController {
-    private func showAlert(title: String, message: String, completion: @escaping () -> Void = {}) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
-            completion()
-        }
-        alertController.addAction(okAction)
-        present(alertController, animated: true)
     }
 }
                 

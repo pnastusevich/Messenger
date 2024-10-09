@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class PeopleViewController: UIViewController {
-    
-    let users = Bundle.main.decode([ModelUser].self, from: "users.json")
+        
+    let users = [ModelUser]()
     var collectionView: UICollectionView!
     var dataSource: UICollectionViewDiffableDataSource<Section, ModelUser>!
     
@@ -24,6 +25,18 @@ class PeopleViewController: UIViewController {
         }
     }
     
+    private let currentUser: ModelUser
+    
+    init(currentUser: ModelUser) {
+        self.currentUser = currentUser
+        super.init(nibName: nil, bundle: nil)
+        title = currentUser.username
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainWhite
@@ -31,7 +44,29 @@ class PeopleViewController: UIViewController {
         setupCollectionView()
         createDataSource()
         reloadData(with: nil)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Log Out", style: .plain, target: self, action: #selector(singOut))
         }
+    
+    @objc private func singOut() {
+        let alertController = UIAlertController(title: "Logout", message: "Are you sure you want to logout?", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { _ in
+            do {
+                try Auth.auth().signOut()
+                
+                if let sceneDelegate = UIApplication.shared.connectedScenes
+                             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+                            let window = sceneDelegate.windows.first {
+                             window.rootViewController = AuthViewController()
+                             window.makeKeyAndVisible()
+                         }
+            } catch {
+                print("Error signing out: \(error.localizedDescription)")
+            }
+        }))
+        present(alertController, animated: true, completion: nil)
+    }
     
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createCompositionalLayout())
