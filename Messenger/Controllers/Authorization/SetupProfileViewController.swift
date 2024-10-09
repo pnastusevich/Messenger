@@ -7,6 +7,7 @@
 
 import FirebaseAuth
 import UIKit
+import SDWebImage
 
 final class SetupProfileViewController: UIViewController {
     
@@ -23,6 +24,15 @@ final class SetupProfileViewController: UIViewController {
     
     private let currentUser: User
     
+    let plusButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let myImage = #imageLiteral(resourceName: "plus")
+        button.setImage(myImage, for: .normal)
+        button.tintColor = .mainDark
+        return button
+    }()
+    
     init(currentUser: User) {
         self.currentUser = currentUser
         super.init(nibName: nil, bundle: nil)
@@ -31,6 +41,9 @@ final class SetupProfileViewController: UIViewController {
             fullNameTextField.text = username
         }
         // to do set google image
+        if let photoURL = currentUser.photoURL {
+            fullImageView.circleImageView.sd_setImage(with: photoURL, completed: nil)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -42,6 +55,14 @@ final class SetupProfileViewController: UIViewController {
         setupView()
         
         goToChatsButton.addTarget(self, action: #selector(goToChatsButtonTapped), for: .touchUpInside)
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func plusButtonTapped() {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = .photoLibrary
+        present(imagePickerController, animated: true, completion: nil)
     }
     
     @objc private func goToChatsButtonTapped() {
@@ -51,7 +72,7 @@ final class SetupProfileViewController: UIViewController {
             id: currentUser.uid,
             email: userEmail,
             username: fullNameTextField.text,
-            avatarImageString: "nil",
+            avatarImage: fullImageView.circleImageView.image,
             description: aboutMeTextField.text,
             gender: genderSegmentedControl.titleForSegment(at: genderSegmentedControl.selectedSegmentIndex)) { result in
                 switch result {
@@ -81,7 +102,7 @@ private extension SetupProfileViewController {
         genderSegmentedControl.translatesAutoresizingMaskIntoConstraints = false
         goToChatsButton.translatesAutoresizingMaskIntoConstraints = false
         
-        setupSubviews(fullImageView, welcomeLabel, genderLabel, fullNameTextField, aboutMeTextField, genderSegmentedControl, goToChatsButton)
+        setupSubviews(fullImageView, welcomeLabel, genderLabel, fullNameTextField, aboutMeTextField, genderSegmentedControl, goToChatsButton, plusButton)
         setupConstraints()
     }
     
@@ -99,6 +120,11 @@ private extension SetupProfileViewController {
             
             fullImageView.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 40),
             fullImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            plusButton.leadingAnchor.constraint(equalTo: fullImageView.trailingAnchor, constant: 16),
+            plusButton.centerYAnchor.constraint(equalTo: fullImageView.centerYAnchor),
+            plusButton.widthAnchor.constraint(equalToConstant: 30),
+            plusButton.heightAnchor.constraint(equalToConstant: 30),
             
             fullNameTextField.topAnchor.constraint(equalTo: fullImageView.bottomAnchor, constant: 40),
             fullNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
@@ -124,6 +150,16 @@ private extension SetupProfileViewController {
             goToChatsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             goToChatsButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate
+extension SetupProfileViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        picker.dismiss(animated: true, completion: nil)
+        guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
+        fullImageView.circleImageView.image = image
     }
 }
                 

@@ -10,30 +10,20 @@ import UIKit
 class AddPhotoView: UIView {
     
     var circleImageView: UIImageView = {
-        let image = UIImageView()
-        image.translatesAutoresizingMaskIntoConstraints = false
-        image.image = UIImage(named: "avatar")
-        image.contentMode = .scaleAspectFill
-        image.clipsToBounds = true
-        image.layer.borderColor = UIColor.black.cgColor
-        image.layer.borderWidth = 1
-        return image
-    }()
-    
-    let plusButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        let myImage = UIImage(named: "plus")
-        button.setImage(myImage, for: .normal)
-        button.tintColor = .mainDark
-        return button
+       let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = #imageLiteral(resourceName: "avatar")
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.borderColor = UIColor.black.cgColor
+        imageView.layer.borderWidth = 1
+        return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(circleImageView)
-        addSubview(plusButton)
         setupConstraints()
     }
     
@@ -44,10 +34,6 @@ class AddPhotoView: UIView {
             circleImageView.widthAnchor.constraint(equalToConstant: 100),
             circleImageView.heightAnchor.constraint(equalToConstant: 100),
             
-            plusButton.leadingAnchor.constraint(equalTo: circleImageView.trailingAnchor, constant: 16),
-            plusButton.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-            plusButton.widthAnchor.constraint(equalToConstant: 30),
-            plusButton.heightAnchor.constraint(equalToConstant: 30)
         ])
         
         self.bottomAnchor.constraint(equalTo: circleImageView.bottomAnchor).isActive = true
