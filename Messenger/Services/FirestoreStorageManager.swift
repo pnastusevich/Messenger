@@ -35,26 +35,40 @@ class FirestoreStorageManager {
         }
     }
     
-    func saveProfileWith(id: String, email: String, username: String?, avatarImageString: String?, description: String?, gender: String?, completion: @escaping (Result<ModelUser, Error>) -> Void) {
+    func saveProfileWith(id: String, email: String, username: String?, avatarImage: UIImage?, description: String?, gender: String?, completion: @escaping (Result<ModelUser, Error>) -> Void) {
         
         guard Validators.isFilled(username: username, description: description, gender: gender) else {
             completion(.failure(UserError.notFilled))
             return
         }
-        let modelUser = ModelUser(username: username ?? "username not found",
+        
+        guard avatarImage != #imageLiteral(resourceName: "avatar") else {
+            completion(.failure(UserError.photoNotExist))
+            return
+        }
+        
+        var modelUser = ModelUser(username: username ?? "username not found",
                                   email: email,
                                   avatarStringURL: "not exist",
                                   description: description ?? "description not found",
                                   gender: gender ?? "gender not found",
                                   id: id
         )
-        self.userReference.document(modelUser.id).setData(modelUser.representation) { (error) in
-            if let error = error {
+        
+        FirebaseStorageManager.shared.upload(photo: avatarImage!) { result in
+            switch result {
+            case .success(let url):
+                modelUser.avatarStringURL = url.absoluteString
+                self.userReference.document(modelUser.id).setData(modelUser.representation) { (error) in
+                    if let error = error {
+                        completion(.failure(error))
+                    } else  {
+                        completion(.success(modelUser))
+                    }
+                }
+            case .failure(let error):
                 completion(.failure(error))
-            } else  {
-                completion(.success(modelUser))
             }
         }
     }
-    
 }
