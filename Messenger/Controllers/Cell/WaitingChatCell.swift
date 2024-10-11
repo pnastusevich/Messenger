@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class WaitingChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
 
@@ -19,8 +20,8 @@ class WaitingChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
     }
     
     func configure<U>(with value: U) where U : Hashable {
-        guard let value: ModelChat = value as? ModelChat else { return }
-        friendImageView.image = UIImage(named: value.userImageString)
+        guard let chat: ModelChat = value as? ModelChat else { return }
+        friendImageView.sd_setImage(with: URL(string: chat.friendAvatarStringURL))
     }
     
     private func setupUICell() {
@@ -43,8 +44,4 @@ class WaitingChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-#Preview {
-    MainTabBarController()
 }

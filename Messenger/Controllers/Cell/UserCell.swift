@@ -88,6 +88,3 @@ class UserCell: UICollectionViewCell, SelfConfiguringCellProtocol {
     
 }
 
-#Preview {
-    MainTabBarController()
-}
