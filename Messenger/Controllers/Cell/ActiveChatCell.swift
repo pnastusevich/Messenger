@@ -6,10 +6,10 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ActiveChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
   
-    
     static var reuseId = "ActiveChatCell"
     
     let friendImageView = UIImageView()
@@ -23,14 +23,10 @@ class ActiveChatCell: UICollectionViewCell, SelfConfiguringCellProtocol {
     }
     
     func configure<U>(with value: U) where U : Hashable {
-        guard let value: ModelChat = value as? ModelChat else { return }
-        friendImageView.image = UIImage(named: value.userImageString)
-        friendName.text = value.username
-        lastMessage.text = value.lastMessage
-    }
-    
-    func configure(with value: ModelChat) {
-    
+        guard let chat: ModelChat = value as? ModelChat else { return }
+        friendName.text = chat.friendUserName
+        lastMessage.text = chat.lastMessageContent
+        friendImageView.sd_setImage(with: URL(string: chat.friendAvatarStringURL), completed: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -47,7 +43,10 @@ extension ActiveChatCell {
         self.layer.cornerRadius = 10
         self.clipsToBounds = true
         
+        friendImageView.contentMode = .scaleAspectFill
+        friendImageView.clipsToBounds = true
         friendImageView.translatesAutoresizingMaskIntoConstraints = false
+        
         gradientView.translatesAutoresizingMaskIntoConstraints = false
         friendName.translatesAutoresizingMaskIntoConstraints = false
         lastMessage.translatesAutoresizingMaskIntoConstraints = false
@@ -88,10 +87,4 @@ extension ActiveChatCell {
         ])
     }
 }
-
-#Preview {
-    MainTabBarController()
-}
-
-
 

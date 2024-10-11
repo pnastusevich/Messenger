@@ -43,7 +43,7 @@ class PeopleViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    //MARK: View life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .mainWhite
@@ -84,6 +84,7 @@ class PeopleViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
+    //MARK: - Setup UI
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createCompositionalLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -92,6 +93,8 @@ class PeopleViewController: UIViewController {
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SectionHeader.reuseId)
         
         collectionView.register(UserCell.self, forCellWithReuseIdentifier: UserCell.reuseId)
+        
+        collectionView.delegate = self
     }
     
     private func reloadData(with searchText: String?) {
@@ -118,7 +121,7 @@ class PeopleViewController: UIViewController {
     }
 }
 
-
+// MARK: - UICollectionViewDiffableDataSource
 extension PeopleViewController {
     private func createDataSource() {
         dataSource = UICollectionViewDiffableDataSource<Section, ModelUser>(collectionView: collectionView, cellProvider: { collectionView, indexPath, user in
@@ -206,6 +209,14 @@ extension PeopleViewController {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
         return sectionHeader
+    }
+}
+// MARK: - UICollectionViewDelegate
+extension PeopleViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let user = self.dataSource.itemIdentifier(for: indexPath) else { return }
+        let profileVC = ProfileViewController(user: user)
+        present(profileVC, animated: true)
     }
 }
 

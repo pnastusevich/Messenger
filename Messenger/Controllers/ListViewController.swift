@@ -6,11 +6,17 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
+
 
 class ListViewController: UIViewController {
     
-    let activeChats = Bundle.main.decode([ModelChat].self, from: "activeChats.json")
-    let waitingChats = Bundle.main.decode([ModelChat].self, from: "waitingChats.json")
+    var activeChats = [ModelChat]()
+    var waitingChats = [ModelChat]()
+    
+    private var waitingChatsListener: ListenerRegistration?
+    private var activeChatsListener: ListenerRegistration?
     
     enum Section: Int, CaseIterable {
         case waitingChats, activeChats
@@ -25,7 +31,7 @@ class ListViewController: UIViewController {
         }
     }
     
-    var dataSource: UICollectionViewDiffableDataSource<Section, ModelChat>!
+    var dataSource: UICollectionViewDiffableDataSource<Section, ModelChat>?
     var collectionView: UICollectionView!
     
     private let currentUser: ModelUser
@@ -34,6 +40,11 @@ class ListViewController: UIViewController {
         self.currentUser = currentUser
         super.init(nibName: nil, bundle: nil)
         title = currentUser.username
+    }
+    
+    deinit {
+        waitingChatsListener?.remove()
+        activeChatsListener?.remove()
     }
     
     required init?(coder: NSCoder) {
@@ -47,6 +58,35 @@ class ListViewController: UIViewController {
         setupCollectionView()
         createDataSource()
         reloadData()
+        
+        waitingChatsListener = ListenerService.shared.waitingChatsObserve(chats: waitingChats, completion: { result in
+            switch result {
+            case .success(let chats):
+                if self.waitingChats != [], self.waitingChats.count <= chats.count {
+                    let chatRequestVC = ChatRequestViewController(chat: chats.last!)
+                    chatRequestVC.delegate = self
+                    self.present(chatRequestVC, animated: true)
+                }
+                self.waitingChats = chats
+                self.reloadData()
+                print(chats.count)
+
+        
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        })
+        
+        activeChatsListener = ListenerService.shared.activeChatsObserve(chats: activeChats, completion: { result in
+            switch result {
+            case .success(let chats):
+                self.activeChats = chats
+                self.reloadData()
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        })
+        
     }
     
     // MARK: - Setup UI
@@ -70,6 +110,8 @@ class ListViewController: UIViewController {
         
         collectionView.register(WaitingChatCell.self, forCellWithReuseIdentifier: WaitingChatCell.reuseId)
         collectionView.register(ActiveChatCell.self, forCellWithReuseIdentifier: ActiveChatCell.reuseId)
+        
+        collectionView.delegate = self
     }
     
     private func reloadData() {
@@ -146,6 +188,25 @@ extension ListViewController {
         return layout
     }
     
+    
+    private func createActiveChats() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                              heightDimension: .fractionalHeight(1))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                               heightDimension: .absolute(78))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 8
+        section.contentInsets = NSDirectionalEdgeInsets.init(top: 16, leading: 20, bottom: 0, trailing: 20)
+        
+        let sectionHeader = createSectionHeader()
+        section.boundarySupplementaryItems = [sectionHeader]
+        return section
+    }
+    
     private func createWaitingChats() -> NSCollectionLayoutSection {
         
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
@@ -166,26 +227,7 @@ extension ListViewController {
         section.boundarySupplementaryItems = [sectionHeader]
         return section
     }
-    
-    private func createActiveChats() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                              heightDimension: .fractionalHeight(1)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                               heightDimension: .absolute(78)
-        )
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize,
-                                                     subitems: [item]
-        )
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 8
-        section.contentInsets = NSDirectionalEdgeInsets.init(top: 16, leading: 20, bottom: 0, trailing: 20)
-        let sectionHeader = createSectionHeader()
-        section.boundarySupplementaryItems = [sectionHeader]
-        return section
-    }
-    
+  
     private func createSectionHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let sectionHeaderSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                        heightDimension: .estimated(1)
@@ -195,6 +237,47 @@ extension ListViewController {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
         return sectionHeader
+    }
+}
+// MARK: - UICollectionViewDelegate
+extension ListViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let chat = self.dataSource?.itemIdentifier(for: indexPath) else { return }
+        guard let section = Section(rawValue: indexPath.section) else { return }
+        
+        switch section {
+        case .waitingChats:
+            let chatRequestVC = ChatRequestViewController(chat: chat)
+            chatRequestVC.delegate = self
+            self.present(chatRequestVC, animated: true)
+        case .activeChats:
+            let chatsVC = ChatsViewController(user: currentUser, chat: chat)
+            navigationController?.pushViewController(chatsVC, animated: true)
+        }
+    }
+}
+
+extension ListViewController: WaitingChatsNavigationDelegate {
+    func removeWaitingChat(chat: ModelChat) {
+        FirestoreStorageManager.shared.deleteWaitingChat(chat: chat) { result in
+            switch result {
+            case .success():
+                self.showAlert(title: "Done", message: "Chats \(chat.friendUserName) has been removed")
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        }
+    }
+    
+    func chatToActive(chat: ModelChat) {
+        FirestoreStorageManager.shared.changeToActive(chat: chat) { result in
+            switch result {
+            case .success():
+                self.showAlert(title: "Done", message: "Have a nice conversation with a  \(chat.friendUserName)")
+            case .failure(let error):
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        }
     }
 }
     
